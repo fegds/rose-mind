@@ -1,0 +1,8 @@
+<ul class="log-times">
+	<li ng-repeat="(key, value) in users" class="log-time">
+		<span class="avatar">
+			<img ng-src="img/avatar/{{ value.avatar }}" class="avatar-img" title="{{ value.name }}">
+		</span>
+		<progress value="{{ value.value }}" max="7">{{ value.value }}%</progress>
+	</li>
+</ul>

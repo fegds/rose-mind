@@ -1,0 +1,21 @@
+<table class="bs-table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Subject</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="task in tasks">
+			<td>{{ task.id }}</td>
+			<td><a href="#/tasks/{{ task.id }}">{{ task.subject }}</a></td>
+        </tr>
+    </tbody>
+</table>
+
+<form class="user-list">
+	<label for="option-{{ $index }}" ng-repeat="user in users" class="user-item">
+		<input id="option-{{ $index }}" type="checkbox" ng-model=" user.checked " ng-change="updateList()">
+			{{ user.firstname + ' ' + user.lastname }}
+    </label>
+</form>

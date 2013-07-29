@@ -1,0 +1,4 @@
+<h1>{{ task.subject }}</h1>
+<a href="{{ attach.content_url.replace('127.0.0.1', '192.168.10.28') }}" ng-repeat=" attach in task.attachments " target="_blank">{{ attach.filename }}</a>
+
+<div class="task-body" ng-bind-html=" task.description "></div>
