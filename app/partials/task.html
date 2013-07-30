@@ -1,4 +1,46 @@
-<h1>{{ task.subject }}</h1>
-<a href="{{ attach.content_url.replace('127.0.0.1', '192.168.10.28') }}" ng-repeat=" attach in task.attachments " target="_blank">{{ attach.filename }}</a>
+<header class="task-header task-priority-{{ task.priority.id }} task-status-{{ task.status.id }}">
+	<span class="avatar">
+		<img ng-src="{{ avatar }}" class="avatar-img" title="{{ assignee }}">
+	</span>
 
-<div class="task-body" ng-bind-html=" task.description "></div>
+	<h1 class="task-heading">{{ task.subject }}</h1>
+	<a href="{{ attach.content_url.replace('127.0.0.1', '192.168.10.28') }}" ng-repeat=" attach in task.attachments " target="_blank" class="attachment">{{ attach.filename }}</a>
+</header>
+
+<div class="grid-3-4 task-main">
+	<div class="task-body" ng-bind-html=" task.description ">
+	</div>
+	<ul class="task-comments">
+		<li ng-repeat="comment in comments" class="task-comment">
+			<span class="avatar">
+				<img ng-src="{{ comment.author.avatar }}" class="avatar-img" title="{{ comment.author.name }}">
+				{{ comment.author.name }}
+			</span>
+			<ul class="task-comment-move">
+				<li ng-repeat="note in comment.notes">
+					<strong>
+						{{ note.target }}
+					</strong>
+					<span class="move">
+						{{ note.move }}
+					</span>
+				</li>
+			</ul>
+			<p ng-bind-html=" comment.comment ">
+			</p>
+			<time class="task-comment-date">{{ comment.date }}</time>
+		</li>
+	</ul>
+</div>
+
+<aside class="grid-1-4">
+	<ul class="task-metas">
+		<li ng-repeat="meta in metas" class="task-meta">
+			<span class="label">
+				{{ meta.label }}:
+			</span>
+			<span class="value">{{ meta.value }}</span>
+		</li>
+	</ul>
+</aside>
+

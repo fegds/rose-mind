@@ -3,11 +3,12 @@ body {
 	margin: 0;
 	overflow-y: scroll;
 	font: 16px/1.65 'sans-serif';
-	color: #666;
+	color: #555;
 }
 
 a {
     color: #3B8BBA;
+	text-decoration: none;
 }
 /*
 a:visited {
@@ -15,10 +16,10 @@ a:visited {
 }
 */
 a:hover {
-    text-decoration: none;
+    text-decoration: underline;
 }
 
-h3, p{
+h1, h3, p{
 	margin-top: 0;
 }
 p + h3 {
@@ -79,7 +80,7 @@ abbr[title] {
 	border-top: 1px solid #dddddd;
 }
 
-.bs-table tbody > tr:nth-child(even) > td{
+.bs-table-striped tbody > tr:nth-child(even){
 	background-color: #f9f9f9;
 }
 
@@ -96,7 +97,7 @@ abbr[title] {
 */
 
 /* grid */
-.grid-1-2, .grid-1-3 {
+.grid-1-2, .grid-1-3, .grid-2-3, .grid-3-4, .grid-1-4 {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 
@@ -112,4 +113,13 @@ abbr[title] {
 }
 .grid-1-3 {
 	width: 33%;
+}
+.grid-2-3 {
+	width: 66%;
+}
+.grid-3-4 {
+	width: 74%;
+}
+.grid-1-4 {
+	width: 25%;
 }

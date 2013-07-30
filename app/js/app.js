@@ -3,7 +3,7 @@
 // Declare app level module which depends on filters, and services
 // angular.module('FEBG', ['myApp.filters', 'myApp.services', 'myApp.directives', 'myApp.controllers']).
 angular.module('RM', [
-    'RM.controllers', 'ngSanitize'
+    'RM.controllers', 'RM.directives', 'ngSanitize'
 ]).
 config([
     '$routeProvider', '$httpProvider', function($routeProvider, $httpProvider){
@@ -17,9 +17,11 @@ config([
 				controller: item.id
 			};
 
+			/*
 			if(item.id === 'TaskCtrl'){
 				route[ 'reloadOnSearch' ] = false;
 			}
+			*/
 			$routeProvider.when(item.url, route);
 		}
         $routeProvider.otherwise({

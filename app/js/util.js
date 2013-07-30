@@ -2,10 +2,26 @@
 
 (function(){
 
-window.getUsername = function(uid){
-	var user = Users[uid];
+window.getUser = function(uid){
+	var user = Users[uid],
+		firstname = user.firstname,
+		avatar = user.avatar;
 
-	return user.firstname + ' ' + user.lastname;
+	if(avatar){
+		avatar += '.jpg';
+	}else{
+		avatar = 'default.png';
+	}
+
+	if(/[\u3400-\u9FBF]/.test(firstname)){
+		name = user.lastname + firstname;
+	}else{
+		name = firstname + ' ' + user.lastname;
+	}
+	return {
+		name: name,
+		avatar: 'img/avatar/' + avatar
+	};
 };
 
 })();

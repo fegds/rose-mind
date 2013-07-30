@@ -46,6 +46,22 @@ angular.module('RM.controllers', [])
 				angular.element(document.getElementById('route_' + currentCtrl)).addClass('active');
 			});
 
+			$http.get(
+				URL.redmine_api.version
+			)
+			.success(function(d){
+				var i, item, versions_raw = d.versions,
+					versions = CONS.versions;
+
+				for(i=0; i<versions_raw.length; i++){
+					item = versions_raw[i];
+
+					versions[item.id] = {
+						name: item.name
+					};
+				}
+			});
+
 			$scope.signOut = function(){
 				localStorage.setItem('Current', '');
 				$window.location.href = 'sign-in.html';
@@ -57,44 +73,78 @@ angular.module('RM.controllers', [])
 			}
         }
     ])
-    .controller('TasksCtrl', ['$scope', '$http', '$filter',
-        function ($scope, $http, $filter){
+    .controller('TasksCtrl', ['$scope', '$http', '$filter', '$routeParams', '$location',
+        function ($scope, $http, $filter, $routeParams, $location){
 
-			var i, item;
+			var i, item,
+				assignees = {},
+				assignees_raw = $routeParams.assignees;
 
 			$scope.users = [
+			];
 		/*
+			[
 				{
 					firstname: '前端组',
 					lastname: '',
 					id: Users.f2e.join('|')
 				}
-				*/
 			];
+				*/
+
+			if(assignees_raw){
+				assignees_raw = (assignees_raw + '').split('|');
+				for(i=0; i<assignees_raw.length; i++){
+					assignees[assignees_raw[i]] = true;
+					// $scope.users[assignees_raw[i]]['checked'] = true;
+				}
+			}else{
+				assignees[Current.id] = true;
+				// $scope.users[Current.id]['checked'] = true;
+				// $location.search('assignees', Current.id);
+			}
 
 			for(i in Users){
-				item = Users[i];
+				item = getUser(i);
+
+				/*
 				item['id'] = i;
-				item['checked'] = i*1 === Current.id ? true : false;
-				$scope.users.push(item);
+				item['checked'] = assignees[i*1];
+				*/
+				$scope.users.push({
+					id: i,
+					name: item.name,
+					avatar: item.avatar,
+					group: Users[i].group,
+					checked: assignees[ i * 1 ]
+				});
 			};
 
 			$scope.current = Current.id;
 
-			$scope.updateList = function(){
-				var assignee = [],
+			$scope.toggleItem = function(user){
+				if(user){
+					user.checked = !user.checked;
+				}
+
+				var params = {},
+					assignee = [],
 					assignees = $filter('filter')($scope.users, { checked: true });
 
-				for(i=0; i<assignees.length; i++){
-					assignee.push(assignees[i].id);
+				console.log(assignees);
+				if(assignees.length){
+					for(i=0; i<assignees.length; i++){
+						assignee.push(assignees[i].id);
+					}
+					params = {
+						assigned_to_id: assignee.join('|')
+					}
 				}
 
 				$http.get(
 					URL.redmine_api.task.list,
 					{
-						params: {
-							assigned_to_id: assignee.join('|')
-						}
+						params: params
 					}
 				)
 				.success(function(data){
@@ -102,7 +152,7 @@ angular.module('RM.controllers', [])
 				});
 			}
 
-			$scope.updateList();
+			$scope.toggleItem();
 
 			/*
 			(function(){
@@ -156,26 +206,153 @@ angular.module('RM.controllers', [])
 
 			})();
 			*/
+
+			$scope.groups = [
+				{
+					label: '前',
+					value: 'f2e'
+				},
+				{
+					label: '后',
+					value: 'b2e'
+				},
+				{
+					label: '测',
+					value: 'qc'
+				},
+				{
+					label: '产',
+					value: 'prod'
+				},
+				{
+					label: '美',
+					value: 'ui'
+				},
+				{
+					label: '组',
+					value: 'group'
+				}
+			];
+
         }
     ])
-    .controller('TaskCtrl', ['$scope', '$routeParams', '$http',
-        function($scope, $routeParams, $http){
+    .controller('TaskCtrl', ['$scope', '$routeParams', '$http', '$filter',
+        function($scope, $routeParams, $http, $filter){
 
 			$scope.task = {};
+
+			var getTargetMove = function(detail){
+				var name, move,
+					from = detail.old_value,
+					to = detail.new_value
+					;
+
+				switch(detail.property){
+					case 'attr':
+						switch(detail.name){
+							case 'fixed_version_id':
+								name = 'Target Version';
+								from = CONS.versions[from].name;
+								to = CONS.versions[to].name;
+								break;
+							case 'project_id':
+								name = 'Project';
+								/*
+								from = CONS.versions[from].name;
+								to = CONS.versions[to].name;
+								*/
+								break;
+							case 'subject':
+								name = 'Subject';
+								break;
+							case 'status_id':
+								name = 'Status';
+								from = CONS.task_statuses[from];
+								to = CONS.task_statuses[to];
+								break;
+							case 'done_ratio':
+								name = 'Done';
+								break;
+							case 'assigned_to_id':
+								name = 'Assignee';
+								from = getUser(from).name;
+								to = getUser(to).name;
+								break;
+						}
+						move = from + ' => ' + to;
+						break;
+					case 'attachment':
+						name = 'Attachment';
+						move = to + ' Added';
+						break;
+				}
+
+				return {
+					target: name,
+					move: move
+				};
+			};
 
 			$http.get(
 				URL.redmine_api.task.item + $routeParams.id + '.json?include=attachments,journals'
 			)
 			.success(function(d){
-				// var data = d.user;
+				var i, item, journals_raw, notes, author, details, n, metas,
+					comments = [],
+					data = d.issue,
+					journals_raw = data.journals,
+					targetVersion = data.fixed_version;
 
 				$scope.task = d.issue;
 
-				/*
-				data['signin'] = name_password;
-				localStorage.setItem('Current', JSON.stringify(data));
-				$location.path(Route.tasks.url);
-				*/
+				$scope.avatar = getUser(data.assigned_to.id).avatar;
+
+				for(i=0; i<journals_raw.length; i++){
+					notes = [];
+
+					item = journals_raw[i];
+					author = getUser(item.user.id);
+					details = item.details;
+
+					for(n=0; n<details.length; n++){
+						notes.push(getTargetMove(details[n]));
+					}
+
+					comments.push({
+						author: {
+							name: author.name,
+							avatar: author.avatar
+						},
+						notes: notes,
+						comment: item.notes,
+						date: $filter('date')(item.created_on, 'MM-dd-yyyy')
+					});
+				}
+
+				$scope.comments = comments;
+
+				metas = [
+					{
+						label: 'Author',
+						value: getUser(data.author.id).name
+					},
+					{
+						label: 'Created',
+						value: $filter('date')(data.created_on, 'MM-dd-yyyy')
+					},
+
+				];
+
+				if(targetVersion){
+					metas.push(
+						{
+							label: 'TV',
+							value: targetVersion.name
+						}
+					);
+				}
+
+				$scope.metas = metas;
 			});
         }
     ])
@@ -207,7 +384,7 @@ angular.module('RM.controllers', [])
 					}
 
 					users[uid] = {
-						name: getUsername(uid),
+						name: getUser(uid).name,
 						avatar: avatar,
 						value: 0
 					};
