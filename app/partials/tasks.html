@@ -1,17 +1,19 @@
-<table class="grid-3-4 bs-table task-list">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Subject</th>
-        </tr>
-    </thead>
-    <tbody>
-		<tr ng-repeat="task in tasks" class="task-priority-{{ task.priority.id }} task-status-{{ task.status.id }}">
-			<td>{{ task.id }}</td>
-			<td><a href="#/tasks/{{ task.id }}">{{ task.subject }}</a></td>
-        </tr>
-    </tbody>
-</table>
+<div class="grid-3-4">
+	<table class="bs-table task-list">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Subject</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="task in tasks" class="task-priority-{{ task.priority.id }} task-status-{{ task.status.id }}">
+				<td>{{ task.id }}</td>
+				<td><a href="#/tasks/{{ task.id }}">{{ task.subject }}</a></td>
+			</tr>
+		</tbody>
+	</table>
+</div>
 
 <aside class="grid-1-4 user-list">
 	<div class="user-selected">
@@ -25,7 +27,7 @@
 	</div>
 	<div class="tabbable user-list-panel">
 		<div class="tab-pane" label="{{ group.label }}" ng-repeat="group in groups">
-			<span class="avatar" ng-repeat=" user in users | filter: { group: group.value } " ng-class="{ selected: user.checked == true }" ng-click="toggleItem(user)">
+			<span class="avatar" ng-repeat=" user in users | filter: { group: group.value } " ng-class="{ selected: user.checked == true }" ng-click="toggleItem(user, $event)">
 				<img ng-src="{{ user.avatar }}" class="avatar-img" title="{{ user.name }}">
 				<p>
 					{{ user.name }}

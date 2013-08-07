@@ -27,6 +27,12 @@ angular.module('RM.controllers', [])
 						text: '工时',
 						id: 'times'
 					}
+	/*
+					{
+						text: '货单',
+						id: 'manifest'
+					},
+					*/
 				];
 
 			for(i=0; i<menus.length; i++){
@@ -74,7 +80,7 @@ angular.module('RM.controllers', [])
         }
     ])
     .controller('TasksCtrl', ['$scope', '$http', '$filter', '$routeParams', '$location',
-        function ($scope, $http, $filter, $routeParams, $location){
+        function ($scope, $http, $filter, $routeParams, $location, $event){
 
 			var i, item,
 				assignees = {},
@@ -122,16 +128,11 @@ angular.module('RM.controllers', [])
 
 			$scope.current = Current.id;
 
-			$scope.toggleItem = function(user){
-				if(user){
-					user.checked = !user.checked;
-				}
-
+			var filterUser = function(){
 				var params = {},
 					assignee = [],
 					assignees = $filter('filter')($scope.users, { checked: true });
 
-				console.log(assignees);
 				if(assignees.length){
 					for(i=0; i<assignees.length; i++){
 						assignee.push(assignees[i].id);
@@ -150,6 +151,63 @@ angular.module('RM.controllers', [])
 				.success(function(data){
 					$scope.tasks = data.issues;
 				});
+			}
+
+			$scope.toggleItem = function(user, $event){
+				var i, assignees;
+
+				if($event && $event.ctrlKey){
+					user.checked = !user.checked;
+				}else if(user){
+					if(user.checked){
+						return;
+					}
+
+					assignees = $filter('filter')($scope.users, { checked: true });
+					for(i=0; i<assignees.length; i++){
+						assignees[i].checked = false;
+					}
+					user.checked = true;
+				}
+
+				filterUser();
+				/*
+				if(user.checked){
+					return;
+				}
+				if(user){
+					user.checked = !user.checked;
+				}
+
+				var params = {},
+					assignee = [],
+					assignees = $filter('filter')($scope.users, { checked: true });
+
+				// console.log(assignees);
+				if($event.ctrlKey){
+				}else{
+					user.checked = true;
+
+					for(i=0; i<assignees.length; i++){
+						assignees[i].checked = false;
+					}
+					params = {
+						assigned_to_id: assignee.join('|')
+					}
+				}
+
+				/*
+				if(assignees.length){
+					for(i=0; i<assignees.length; i++){
+						assignee.push(assignees[i].id);
+					}
+					params = {
+						assigned_to_id: assignee.join('|')
+					}
+				}
+				*/
+
+				console.log($event);
 			}
 
 			$scope.toggleItem();
@@ -359,8 +417,15 @@ angular.module('RM.controllers', [])
     .controller('TimesCtrl', ['$scope', '$routeParams', '$http', '$filter',
         function($scope, $routeParams, $http, $filter){
 
-			var date = $filter('date')(new Date(), 'yyyy-MM-dd'),
-				f2e = Users.f2e;
+			var i,
+				date = $filter('date')(new Date(), 'yyyy-MM-dd'),
+				f2e = [];
+
+			for(i in Users){
+				if(Users[i].group === 'f2e'){
+					f2e.push( i );
+				}
+			};
 
 			$http.get(
 				URL.redmine_api.times + '?user_id=' + f2e.join('|') + '&spent_on=' + date
@@ -399,6 +464,82 @@ angular.module('RM.controllers', [])
 				}
 
 				$scope.users = users;
+			});
+        }
+    ])
+    .controller('ManifestCtrl', ['$scope', '$routeParams', '$http', '$filter',
+        function($scope, $routeParams, $http, $filter){
+
+			var i, item,
+				manifest = {},
+				f2e = [];
+
+			for(i in Users){
+				if(Users[i].group === 'f2e'){
+					item = getUser(i);
+					f2e.push( i );
+					manifest[i] = {
+						id: i,
+						name: item.name,
+						avatar: item.avatar,
+						tasks: []
+					};
+					/*
+					manifest.push({
+						id: i,
+						name: item.name,
+						avatar: item.avatar,
+						tasks: []
+					});
+					*/
+				}
+			};
+
+			/*
+			var distribute = function(tasks){
+				var volume = Math.ceil(tasks.length / manifest.length),
+					remainder = tasks.length % manifest.length;
+
+				shuffle(tasks);
+				shuffle(manifest);
+
+				log(tasks.length);
+				log(manifest.length);
+				for(i=0; i<manifest.length; i++){
+					if(i === remainder){
+						volume--;
+					}
+					manifest[i].tasks = tasks.splice(0, volume);
+				}
+				$scope.manifest = manifest;
+				// log(manifest);
+			};
+			*/
+
+			var deliver = function(tasks){
+				for(i=0; i<tasks.length; i++){
+					item = tasks[i];
+
+					manifest[item.assigned_to.id].tasks.push(item); // .tasks = tasks.splice(0, volume);
+				}
+			};
+
+			$http.get(
+				URL.redmine_api.task.list,
+				{
+					params: {
+						assigned_to_id: f2e.join('|')
+				/*
+						project_id: 9,
+						fixed_version_id: 17
+						*/
+					}
+				}
+			)
+			.success(function(d){
+				// distribute(d['issues']);
+				deliver(d['issues']);
+				$scope.manifest = manifest;
 			});
         }
     ])

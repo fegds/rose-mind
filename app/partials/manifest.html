@@ -1,0 +1,23 @@
+<div class="grid-1-2" ng-repeat="man in manifest">
+	<table class="bs-table task-list">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Subject</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="task in man.tasks" class="">
+				<td>{{ task.id }}</td>
+				<td><a href="#/tasks/{{ task.id }}">{{ task.subject }}</a></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<span class="avatar">
+		<img ng-src="{{ man.avatar }}" class="avatar-img" title="{{ user.name }}">
+		<p>
+			{{ man.name }}
+		</p>
+	</span>
+</div>

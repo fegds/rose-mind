@@ -33,6 +33,7 @@ abbr[title] {
 /* table */
 .bs-table {
 	border-collapse:collapse;
+	width: 100%;
 	/*
 	border-spacing:0;
 	empty-cells:show;

@@ -3,7 +3,8 @@
 (function(){
 
 window.getUser = function(uid){
-	var user = Users[uid],
+	var name,
+		user = Users[uid],
 		firstname = user.firstname,
 		avatar = user.avatar;
 
@@ -23,5 +24,15 @@ window.getUser = function(uid){
 		avatar: 'img/avatar/' + avatar
 	};
 };
+
+window.log = function(text){
+	console.log(text);
+}
+
+window.shuffle = function(array){
+	// array.sort(function() { return 0.5 - Math.random() });
+
+	for(var j, x, i = array.length; i; j = parseInt(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
+}
 
 })();

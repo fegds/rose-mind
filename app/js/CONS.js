@@ -26,37 +26,13 @@ var	Route = {
 		id: 'TimesCtrl',
 		template: 'times.html',
 		url: '/times'
-	}
-
-			/*
-	redmine: {
-		id: 'RedmineCtrl',
-		template: 'redmine.html',
-		url: '/redmine'
 	},
-	workflow: {
-		id: 'WorkflowCtrl',
-		template: 'workflow.html',
-		url: '/workflow'
+	manifest: {
+		id: 'ManifestCtrl',
+		template: 'manifest.html',
+		url: '/manifest'
 	},
-	bootstrap: {
-		id: 'BootstrapCtrl',
-		template: 'bootstrap.html',
-		url: '/bootstrap'
-	},
-	htmlcssStyleGuide: {
-		id: 'HtmlcssStyleGuideCtrl',
-		template: 'htmlcss_style_guide.html',
-		url: '/htmlcss-style-guide'
-	},
-	javascriptStyleGuide: {
-		id: 'JavascriptStyleGuideCtrl',
-		template: 'javascript_style_guide.html',
-		url: '/javascript-style-guide'
-	}
-	*/
 };
-
 
 (function(){
 
@@ -77,7 +53,7 @@ var i, item,
 	redmine_api_raw = [
 		// [ 'signin', 'login' ],
 		[ 'time', 'time_entries.json' ],
-		[ 'version', 'projects/8/versions.json' ]
+		[ 'version', 'projects/9/versions.json' ]
 	]
 	;
 
@@ -93,7 +69,7 @@ window.URL = {
 })();
 
 var Users = {
-	"f2e": [ 5, 9, 10, 11, 14, 17, 49 ],
+// 	"f2e": [ 5, 9, 10, 11, 14, 17, 49 ],
    "3":{
       "firstname":"Whiskey",
       "lastname":"Yang",
